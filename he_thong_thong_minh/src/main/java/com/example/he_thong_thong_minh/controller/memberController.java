@@ -20,11 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -184,9 +181,47 @@ public class memberController {
 
         model.addAttribute("samples", sampleDTOs);
         return "sampleManager";
-
-
     }
+
+
+    @GetMapping("/deleteSample/{id}")
+    public String deleteSample(@PathVariable("id") Long id) {
+        sampleServ.deleteSample(id);
+        return "redirect:/samples";
+    }
+
+
+    @PostMapping("/images/AdminUpload")
+    public String AdminUploadImage(Model model, @RequestParam("file") MultipartFile file,
+                                   @RequestParam("idCardNumber") String idCardNumber,
+                                   HttpServletRequest request) {
+        String message = "";
+
+        try {
+            sampleServ.save(file);
+            Sample sp = new Sample();
+            String url = MvcUriComponentsBuilder
+                    .fromMethodName(memberController.class, "getImage", file.getOriginalFilename()).build().toString();
+            List<member> Mem = membs.findByIdCard(idCardNumber);
+            sp.setMember(Mem.get(0));
+            sp.setImage(url);
+            sampleServ.saveSample(sp);
+            message = "Uploaded the image successfully: " + file.getOriginalFilename();
+            model.addAttribute("message", message);
+        } catch (Exception e) {
+            message = "Could not upload the image: " + file.getOriginalFilename() + ". Error: " + e.getMessage();
+            model.addAttribute("message", message);
+        }
+
+        return "upload_form";
+    }
+
+    @GetMapping("/addSampleAdmin")
+    public String addSampleAdmin() {
+        return "AdminUpload";
+    }
+
+
 
 
 

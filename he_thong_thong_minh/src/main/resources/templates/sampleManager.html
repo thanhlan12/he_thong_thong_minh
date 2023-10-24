@@ -33,15 +33,22 @@
     <tr>
         <th>ID</th>
         <th>Ảnh</th>
+        <th>Action</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="sample : ${samples}">
         <td th:text="${sample.id}"></td>
         <td><img th:src="@{${sample.image}}" alt="${sample.name}" height="60px" /></td>
+        <td>
+            <a th:href="@{/deleteSample/{id}(id=${sample.id})}" onclick="return confirm('Are you sure?')">Delete</a>
+        </td>
     </tr>
     </tbody>
 </table>
+<li class="nav-item">
+    <a class="nav-link" th:href="@{/addSampleAdmin}">addSample</a>
+</li>
 <div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

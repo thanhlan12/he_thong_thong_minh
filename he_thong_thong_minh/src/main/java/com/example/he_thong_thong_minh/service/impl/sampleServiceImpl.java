@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.example.he_thong_thong_minh.entity.Sample;
@@ -30,6 +31,17 @@ public class sampleServiceImpl implements sampleService {
     public sampleServiceImpl(SampleRepository sampleRepository) {
         this.sampleRepo = sampleRepository;
     }
+
+    @Override
+    public Optional<Sample> findById(Long id) {
+        return sampleRepo.findById(id);
+    }
+
+    @Override
+    public Sample getSampleById(Long id) {
+        return sampleRepo.getSampleById(id);
+    }
+
     @Override
     public List<Sample> findByMember_IdCard(String memberIdCard) {
         return sampleRepo.findByMember_IdCard(memberIdCard);

@@ -14,7 +14,8 @@
   <div th:replace="fragments/header :: header"></div>
 
   <div class="container" style="max-width: 500px">
-    <h3 class="mb-3">Spring Boot Image Upload example</h3>
+    <h3 class="mb-3">Spring Boot Sample Upload</h3>
+
 
     <form
       id="uploadForm"
@@ -22,6 +23,7 @@
       th:action="@{/images/upload}"
       enctype="multipart/form-data">
       <input id="input-file" type="file" name="file" accept="image/png, image/jpeg" />
+<!--      <input type="text" name="idCardNumber" placeholder="Enter ID card number...">-->
       <button class="btn btn-sm btn-outline-success float-right" type="submit">
         Upload
       </button>
