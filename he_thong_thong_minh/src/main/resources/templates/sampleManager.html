@@ -3,52 +3,137 @@
 <head>
     <title>Hiển thị bảng samples</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
         table {
             border-collapse: collapse;
             width: 100%;
+            margin-bottom: 20px;
         }
 
         th, td {
             text-align: left;
-            padding: 8px;
+            padding: 10px;
         }
 
         th {
             background-color: #f2f2f2;
         }
+
+        form {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+        }
+
+        button[type="submit"] {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+
+        .nav-link:hover {
+            background-color: #0056b3;
+        }
+
+        .nav-link:last-child {
+            margin-right: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #999;
+        }
     </style>
 </head>
 <body>
 
-<div th:replace="fragments/header :: header"></div>
+<div class="container">
+    <header>
+        <div th:replace="fragments/header :: header"></div>
+    </header>
 
-<form method="post" action="/searchSampleByIdCard">
-    <input type="text" name="idCardNumber" placeholder="Enter ID card number...">
-    <button type="submit">Search</button>
-</form>
+    <form method="post" action="/searchSampleByIdCard" style="display: flex; column-gap: 5px">
+        <input type="text" name="idCardNumber" placeholder="Enter ID card number..." style="border-radius: 5px">
+        <button type="submit" style="border-radius: 5px">Search</button>
+    </form>
+
+    <div class="nav">
+        <div class="nav-item" style="display: flex; justify-content: flex-end">
+            <a class="nav-link" th:href="@{/addSampleAdmin}" style="margin-right: 0px">Add Sample</a>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Image</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="sample : ${samples}">
+            <td th:text="${sample.id}"></td>
+            <td><img th:src="@{${sample.image}}" alt="${sample.name}" height="60px" /></td>
+            <td>
+                <div style="display: flex;">
+                    <a th:href="@{/editSample/{id}(id=${sample.id})}"
+                       style="text-decoration: none; color: lightslategray; margin-right: 10px;">Edit</a>
+
+                    <a th:href="@{/deleteSample/{id}(id=${sample.id})}"
+                       style="text-decoration: none; color: lightslategray;"
+                       onclick="return confirm('Are you sure?')">Delete</a>
+                </div>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
 
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Ảnh</th>
-        <th>Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="sample : ${samples}">
-        <td th:text="${sample.id}"></td>
-        <td><img th:src="@{${sample.image}}" alt="${sample.name}" height="60px" /></td>
-        <td>
-            <a th:href="@{/deleteSample/{id}(id=${sample.id})}" onclick="return confirm('Are you sure?')">Delete</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-<li class="nav-item">
-    <a class="nav-link" th:href="@{/addSampleAdmin}">addSample</a>
-</li>
-<div th:replace="fragments/footer :: footer"></div>
+
+    <footer class="footer">
+        <p>Footer content</p>
+    </footer>
+    <div th:replace="fragments/footer :: footer"></div> <!-- Thay thế với phần footer thực tế -->
+</div>
+
 </body>
 </html>

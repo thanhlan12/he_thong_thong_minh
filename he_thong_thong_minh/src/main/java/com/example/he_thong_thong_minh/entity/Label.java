@@ -1,5 +1,7 @@
 package com.example.he_thong_thong_minh.entity;
 
+import com.example.he_thong_thong_minh.dto.labelDTO;
+import com.example.he_thong_thong_minh.dto.sampleDTO;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -13,6 +15,16 @@ public class Label implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String value;
+
+    public Label(Long id, String name, String value) {
+        this.id = id;
+        this.name = name;
+        this.value = value;
+    }
+
+    public Label() {
+    }
 
     @ManyToMany
     @JoinTable(
@@ -20,6 +32,10 @@ public class Label implements Serializable {
             joinColumns = @JoinColumn(name = "label_id"),
             inverseJoinColumns = @JoinColumn(name = "sample_id"))
     private List<Sample> samples;
+
+    public labelDTO toDTO() {
+        return new labelDTO(name, value);
+    }
 
 }
 

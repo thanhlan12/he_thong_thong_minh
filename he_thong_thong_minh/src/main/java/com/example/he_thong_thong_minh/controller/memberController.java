@@ -1,15 +1,17 @@
 package com.example.he_thong_thong_minh.controller;
 
 import com.example.he_thong_thong_minh.dto.sampleDTO;
+import com.example.he_thong_thong_minh.dto.labelDTO;
+import com.example.he_thong_thong_minh.entity.Label;
 import com.example.he_thong_thong_minh.entity.Sample;
 import com.example.he_thong_thong_minh.entity.member;
+import com.example.he_thong_thong_minh.repository.LabelRepository;
+import com.example.he_thong_thong_minh.service.labelService;
 import com.example.he_thong_thong_minh.service.memberService;
 import com.example.he_thong_thong_minh.service.sampleService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -22,11 +24,8 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 import java.util.*;
 
-import java.util.stream.Collectors;
-
 
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +41,12 @@ public class memberController {
 
     @Autowired
     private memberService membs;
+
+    @Autowired
+    private labelService labServ;
+
+    @Autowired
+    private LabelRepository labelRepository;
 
 
 
@@ -102,8 +107,7 @@ public class memberController {
     public ResponseEntity<Resource> getImage(@PathVariable String filename) {
         Resource file = sampleServ.load(filename);
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+        return ResponseEntity.ok().body(file);
     }
 
     @Autowired
@@ -121,17 +125,17 @@ public class memberController {
 
     @PostMapping("/register")
     @Transactional
-    public ResponseEntity<?> registerMember(@RequestParam("username") String username,
-                                            @RequestParam("password") String password,
-                                            @RequestParam("idCard") String idCard,
-                                            @RequestParam("name") String name){
+    public String registerMember(@RequestParam("username") String username,
+                                 @RequestParam("password") String password,
+                                 @RequestParam("idCard") String idCard,
+                                 @RequestParam("name") String name){
         member memb = new member();
         memb.setUsername(username);
         memb.setPassword(password);
         memb.setIdCard(idCard);
         memb.setName(name);
         mem.save(memb);
-        return ResponseEntity.ok("Member registered successfully");
+        return "redirect:/samples";
     }
 
 
@@ -213,7 +217,7 @@ public class memberController {
             model.addAttribute("message", message);
         }
 
-        return "upload_form";
+        return "AdminUpload";
     }
 
     @GetMapping("/addSampleAdmin")
@@ -222,6 +226,83 @@ public class memberController {
     }
 
 
+    @GetMapping("/editSample/{id}")
+    public String viewSample(@PathVariable("id") Long id, Model model) {
+        List<Label> labelDTOs = labelRepository.getAllLabelById(id);
+//        List<labelDTO> labelDTOs = new ArrayList<>();
+//        for (Label l : labels) {
+//            System.out.println(l.getValue());
+//            labelDTOs.add(l.toDTO());
+//        }
+        model.addAttribute("labels", labelDTOs);
+        return "detailView";
+    }
+
+
+//    @PostMapping("/saveChange")
+//    public String saveChange(@ModelAttribute("labels") List<Label> labels) {
+//        for (Label l : labels) {
+//            System.out.println(l.getName()+"//////////////////--------------------------////////////////////////"+ l.getValue());
+//            labServ.saveNewLabel(l);
+//        }
+//        return "redirect:/samples";
+//    }
+
+
+
+
+//    @PostMapping("/saveChange")
+//    public String saveLabels(@ModelAttribute("labels") List<Label> labels) {
+//        System.out.println("//////////////////////////////////////////////////////////////////////////////////////////////////");
+//        // Lặp qua danh sách các nhãn và lưu từng nhãn
+//        for (Label label : labels) {
+//            System.out.println(label.getName()+"///////////////////////////////////////////////////////////");
+//            System.out.println(label.getValue()+"///////////////////////////////////////////////////////////");
+//            System.out.println(label.getId()+"///////////////////////////////////////////////////////////");
+//            System.out.println("//////////////////////////////////////////////////////////////////////////////////////////////////");
+//            // Giả sử bạn có một phương thức dịch vụ để lưu nhãn
+//            labelRepository.save(label);
+//        }
+//
+//        // Chuyển hướng đến trang phù hợp sau khi lưu
+//        return "redirect:/samples";
+//    }
+
+
+    @PostMapping("/saveChange")
+    public String saveChange(@RequestParam(name = "id")List<String> ids,@RequestParam(name = "name")List<String> names,@RequestParam(name = "value")List<String> values) {
+        log.info("Ids: {}",ids);
+        log.info("name: {}",names);
+        log.info("value: {}",values);
+
+        for (int i=0;i< ids.size();i++){
+            Label existingLabel = labelRepository.findById(Long.parseLong(ids.get(i))).orElse(null);
+            if (existingLabel != null) {
+                existingLabel.setName(names.get(i));
+                existingLabel.setValue(values.get(i));
+                labelRepository.save(existingLabel);
+            }
+        }
+        return "redirect:/samples";
+//        for (String key : requestParams.keySet()) {
+//            System.out.println(key);
+//            if (key.startsWith("name")) {
+//                System.out.println("00000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+//                Long id = Long.parseLong(key.replace("name", ""));
+//                String name = requestParams.get(key);
+//                String value = requestParams.get(key.replace("name", "value"));
+//                System.out.println(name+"//////////////////////////////////////////////-----------////////////////"+ value);
+//                Label existingLabel = labelRepository.findById(id).orElse(null);
+//                if (existingLabel != null) {
+//                    existingLabel.setName(name);
+//                    existingLabel.setValue(value);
+//                    labelRepository.save(existingLabel);
+//                }
+//                return "redirect:/samples";
+//            }
+//        }
+//        return "redirect:/samples";
+    }
 
 
 

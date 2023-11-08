@@ -1,0 +1,11 @@
+<form method="post" action="/saveChange">
+    <h2>Thông tin Căn cước công dân</h2>
+    <ul>
+        <li th:each="label, index : ${labels}">
+            <input type="hidden" name="id" th:value="${label.id}?${label.id}">
+            <input type="text" class="form-control" name="name" th:value="${label.name}" />:
+            <input type="text" class="form-control" name="value" th:value="${label.value}" /><br>
+        </li>
+    </ul>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+</form>
